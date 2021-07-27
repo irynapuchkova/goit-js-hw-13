@@ -49,7 +49,7 @@ async function onFetchQuery(e) {
 
     if (pictures.length < 40) {
         refs.loadMoreBtn.classList.add('visually-hidden');
-        Notiflix.Notify.warning("We're sorry, but you've reached the end of search results.");
+        Notiflix.Notify.warning("We're sorry, but that is all of search results.");
         }
 
     if (TOTAL_HITS > 40) {
