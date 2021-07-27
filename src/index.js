@@ -47,10 +47,6 @@ async function onFetchQuery(e) {
 
     Notiflix.Notify.info(`We've found ${TOTAL_HITS} hits of query.`);
 
-    if (pictures.length < 40) {
-        refs.loadMoreBtn.classList.add('visually-hidden');
-        Notiflix.Notify.warning("We're sorry, but that is all of search results.");
-        }
 
     if (TOTAL_HITS > 40) {
       refs.loadMoreBtn.classList.remove('visually-hidden');
@@ -84,6 +80,11 @@ async function onMoreHits(e) {
       Notiflix.Notify.success('New hits are loading');
       refs.gallery.insertAdjacentHTML('beforeend', markup);
 
+      if (pictures.length < 40) {
+        refs.loadMoreBtn.classList.add('visually-hidden');
+        Notiflix.Notify.warning("We're sorry, but that is all of search results.");
+    }
+    
     }
   
     catch (error) {
