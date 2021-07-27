@@ -1,10 +1,10 @@
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-    'Open Sans', 'Helvetica Neue', sans-serif;
-  line-height: 1.5;
-  background-color: whitesmoke;
-  color: #424242;
-  max-width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+    'Helvetica Neue', sans-serif;
+  background-color: #fff;
+  color: #212121;
 }
 
 img {
@@ -12,6 +12,7 @@ img {
   height: 100%;
   max-width: 100%;
   object-fit: cover;
+  margin: 0;
 }
 
 span {
@@ -19,8 +20,23 @@ span {
   font-weight: 400;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+
+  white-space: nowrap;
+  clip-path: inset(100%);
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
 .container {
-  padding: 0 10px;
+  width: 1200px;
+  padding: 0 15px;
   margin-left: auto;
   margin-right: auto;
 }
@@ -53,14 +69,17 @@ span {
 .gallery-list {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-evenly;
-  grid-column-gap: 10px;
+  // justify-content: space-evenly;
+  // grid-column-gap: 10px;
   grid-row-gap: 10px;
+  // margin-left: -10px;
 }
 
 .photo-card {
-  display: inline-table;
+  display: flex;
+  flex-direction: column;
   margin-right: 10px;
+  flex-basis: calc((100% - 80px) / 4);
 }
 
 .photo-card--thumb {
@@ -72,6 +91,8 @@ span {
 .photo-card__info {
   padding: 0 10px 10px;
   flex-grow: 1;
+  font-size: 14px;
+  line-height: 1.714;
 }
 
 .photo-card__info--item {

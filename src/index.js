@@ -3,7 +3,7 @@ import Notiflix from "notiflix";
 
 import photoCard from './template/photo_card.hbs'
 import getRefs from './js/getRefs';
-import { fetchPictures } from './js/fetch_picture';
+import { fetchQuery } from './js/fetch_picture';
 // import {INPUT_VALUE,DATA_STATE,PAGE,TOTAL_HITS,HITS,} from './js/constant'
 
 let INPUT_VALUE = '';
@@ -16,82 +16,60 @@ let QUERY;
 const refs = getRefs();
 
 
-refs.loadMoreBtn.setAttribute('hidden', 'hidden');
+refs.input.addEventListener('input', handleInputValue) 
+refs.inputBtn.addEventListener('click', onFetchQuery)
+refs.loadMoreBtn.addEventListener('click', onMoreHits)
 
-console.log(refs.loadMoreBtn);
-refs.gallery.innerHTML = '';
+refs.loadMoreBtn.classList.add('visually-hidden');
 
-refs.input.addEventListener('input', getQueryContex) 
-refs.inputBtn.addEventListener('click', fetchQuery)
-refs.loadMoreBtn.addEventListener('click', getMoreHits)
-
-function getQueryContex(e) {
+function handleInputValue(e) {
   e.preventDefault();
-  // refs.loadMoreBtn.setAttribute('hidden', 'hidden');
-  INPUT_VALUE = e.target.value.toLowerCase().trim();
-  if (!INPUT_VALUE) {
-    window.location.reload();
-    refs.loadMoreBtn.setAttribute('hidden', 'hidden');
-  }
-  return INPUT_VALUE;
+  INPUT_VALUE = e.target.value.trim();
 }
   
-async function fetchQuery(e) {
+async function onFetchQuery(e) {
   e.preventDefault();
  
   if (INPUT_VALUE === '') {
     Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
     return;
-  } else {
-    try {
-      QUERY = await fetchPictures(INPUT_VALUE, PAGE, HITS );
-      const pictures = await QUERY.data.hits;
-      TOTAL_HITS = await QUERY.data.totalHits;
-      DATA_STATE = [...pictures];
+  }
+  
+  try {
+    QUERY = await fetchQuery(INPUT_VALUE, PAGE, HITS );
+    const pictures = await QUERY.data.hits;
+    TOTAL_HITS = await QUERY.data.totalHits;
 
-      refs.inputBtn.setAttribute('disabled', 'disabled')
-    
-      if (pictures.length === 0 || INPUT_VALUE === '') {
-        refs.inputBtn.removeAttribute('disabled');
-        refs.gallery.innerHTML = '';
-        Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
-        return;
-      }
+    DATA_STATE = [...pictures];
 
-      if (TOTAL_HITS > 0) {
-        Notiflix.Notify.info(`For you we've found ${TOTAL_HITS} hits of query.`);
+    const markup = await photoCard(DATA_STATE);
+    refs.gallery.innerHTML = markup;
 
-        const markup = await photoCard(DATA_STATE);
-        refs.gallery.innerHTML = markup;
-      }
+    Notiflix.Notify.info(`We've found ${TOTAL_HITS} hits of query.`);
 
-      if (TOTAL_HITS > 40) {
-        refs.loadMoreBtn.removeAttribute('hidden');
-        refs.loadMoreBtn.addEventListener('click', getMoreHits);
-        return;
-      } else {
-        refs.loadMoreBtn.setAttribute('hidden', 'hidden');
-        refs.inputBtn.setAttribute('abled', 'abled');
-      }
-
-    } catch (error) {
-      console.error(error);
+    if (TOTAL_HITS > 40) {
+      refs.loadMoreBtn.classList.remove('visually-hidden');
+      refs.loadMoreBtn.addEventListener('click', onMoreHits);
+      return;
+    } 
+  
+    if (pictures.length === 0) {
+      refs.loadMoreBtn.classList.add('visually-hidden');
+      
+      Notiflix.Notify.failure("Sorry, there are no images matching your search query. Please try again.");
+      return;
     }
+
+  } catch (error) {
+    console.error(error);
   }
 }
 
-async function getMoreHits(e) {
+async function onMoreHits(e) {
   e.preventDefault();
-  
-  if (DATA_STATE.length === TOTAL_HITS) {
-    // refs.loadMoreBtn.setAttribute('hidden', 'hidden');
-    Notiflix.Notify.warning("We're sorry, but you've reached the end of search results.");
 
-    // refs.inputBtn.setAttribute('abled', 'abled');
-    return;
-  } else {
     try {
-      QUERY = await fetchPictures(INPUT_VALUE, ++PAGE, HITS);
+      QUERY = await fetchQuery(INPUT_VALUE, ++PAGE, HITS);
       const pictures = await QUERY.data.hits;
 
       DATA_STATE = [...DATA_STATE, ...pictures];
@@ -100,14 +78,15 @@ async function getMoreHits(e) {
 
       Notiflix.Notify.success('New hits are loading');
       refs.gallery.insertAdjacentHTML('beforeend', markup);
+
+      if (pictures.length < 40) {
+        refs.loadMoreBtn.classList.add('visually-hidden');
+        Notiflix.Notify.warning("We're sorry, but you've reached the end of search results.");
+        }
     }
   
     catch (error) {
       console.error(error);
     }
-  }
 }
 
-
-
-// Notiflix.Notify.warning('Warning message text');
